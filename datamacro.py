@@ -1,13 +1,16 @@
+# 자동으로 이륜차번호판 데이터셋과, 그 라벨들을 만들어 저장하는 코드
+
 from pptx import Presentation # 라이브러리
 import win32com.client # pptx 의 jpg 변환을 위한 라이브러리
 import platedata # 번호판 정보를 담고 있는 라이브러리
 import random
 import pickle # 딕셔너리 저장용 라이브러리
+import os
 
 # prs.slide_layouts[11] : 일반 번호판 레이아웃
 # prs.slide_layouts[12] : 세종 번호판 레이아웃
 
-n = 30 # 제작할 데이터셋의 수
+n = 90 # 제작할 데이터셋의 수
 
 Directory = 'D:\motorcycle\Plate\\'  # 생성된 pptx 파일의 저장 경로
 Directoryjpg = 'D:\motorcycle\PlateJPG\\' # 생성된 jpg 파일의 저장 경로
@@ -65,6 +68,12 @@ filenames = [] # 파일명 저장 리스트
 filedir = [] # ppt 파일경로 저장 리스트
 exportdir = [] # jpg 파일경로 저장 리스트
 
+if not os.listdir(Directory):
+    x = 0 # 기존에 폴더에 존재하던 파일 수
+else:
+    x = len(os.listdir(Directory))
+
+
 for i in range(n): # pptx 제작하기
 
     office = random.choice(platedata.office)
@@ -76,7 +85,7 @@ for i in range(n): # pptx 제작하기
         gatoha = random.choice(platedata.gatoha)
         num = random.randrange(1000,9999)
 
-        filenames.append(newNormalPlate(i,office,local,gatoha,num))
+        filenames.append(newNormalPlate(x+i,office,local,gatoha,num))
         filedir.append(Directory + filenames[i] +'.pptx')
         exportdir.append(Directoryjpg + filenames[i]+'.jpg')
 
@@ -85,7 +94,7 @@ for i in range(n): # pptx 제작하기
         gatoha = random.choice(platedata.gatoha)
         num = random.randrange(1000,9999)
 
-        filenames.append(newSejongPlate(i,gatoha,num))
+        filenames.append(newSejongPlate(x+i,gatoha,num))
         filedir.append(Directory + filenames[i]+'.pptx')
         exportdir.append(Directoryjpg + newSejongPlate(i,gatoha,num)+'.jpg')
 
@@ -132,7 +141,6 @@ for i in range(len(filenames)):
 
     label.append(info)
 
-print(label)
 
 with open('label.pkl','wb') as f: # 생성된 라벨 저장용
     pickle.dump(label, f)
